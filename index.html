@@ -40,45 +40,52 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
-            background: rgba(255, 255, 255, 0.95);
+            background: transparent;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             padding: 20px;
             max-width: 90vw;
-            max-height: 80vh;
+            max-height: 85vh;
             display: none;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px);
         }
 
         #image-container {
             position: relative;
-            width: 320px;
-            height: 240px;
-            max-width: 100%;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            background: #1a1a1a;
+            width: 250px;
+            height: 500px;
+            max-width: 80vw;
+            max-height: 60vh;
+            border-radius: 15px;
+            overflow: visible;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #theater-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
+            object-fit: contain;
+            border-radius: 15px;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
         }
 
         #text-overlay {
             position: absolute;
-            bottom: 0;
+            bottom: -60px;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+            background: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 25px 15px 15px 15px;
+            padding: 15px;
             text-align: center;
             font-size: 14px;
             line-height: 1.5;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         #main-text {
@@ -166,8 +173,9 @@
 
         @media (max-width: 480px) {
             #image-container {
-                width: 280px;
-                height: 210px;
+                width: 200px;
+                height: 400px;
+                max-height: 50vh;
             }
             
             #image-card {
@@ -175,8 +183,9 @@
             }
             
             #text-overlay {
-                padding: 20px 12px 12px 12px;
+                padding: 12px;
                 font-size: 13px;
+                bottom: -50px;
             }
             
             #main-text {
@@ -216,7 +225,7 @@
         <button id="close-button">×</button>
         <div id="image-container">
             <img id="theater-image" 
-                src="doll.png" 
+                src="https://via.placeholder.com/320x240/1a1a1a/ffffff?text=GEAR%0A%E3%83%8E%E3%83%B3%E3%83%90%E3%83%BC%E3%83%90%E3%83%AB%E3%82%B7%E3%82%A2%E3%82%BF%E3%83%BC" 
                 alt="ノンバーバルシアター ギア">
             <div id="text-overlay">
                 <div id="main-text">答えは、ここに</div>
