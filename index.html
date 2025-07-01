@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ギア - AR招待状</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Sans', 'ヒラギノ角ゴシック', Arial, sans-serif;
+            background: #000;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+        }
+
+        #camera-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #camera {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #image-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            max-width: 90vw;
+            max-height: 80vh;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        #image-container {
+            position: relative;
+            width: 320px;
+            height: 240px;
+            max-width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            background: #1a1a1a;
+        }
+
+        #theater-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        #text-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+            color: white;
+            padding: 25px 15px 15px 15px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        #main-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #sub-text {
+            font-size: 14px;
+            opacity: 0.9;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #start-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            background: linear-gradient(135deg, #d4af37, #f4d03f);
+            color: #1a1a1a;
+            border: none;
+            padding: 18px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #start-button:hover {
+            background: linear-gradient(135deg, #b8941f, #d4af37);
+            transform: translate(-50%, -50%) translateY(-2px);
+            box-shadow: 0 12px 25px rgba(212, 175, 55, 0.5);
+        }
+
+        #close-button {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        #close-button:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        #error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 30;
+            background: #e74c3c;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            max-width: 80%;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 25;
+            color: white;
+            font-size: 16px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            #image-container {
+                width: 280px;
+                height: 210px;
+            }
+            
+            #image-card {
+                padding: 15px;
+            }
+            
+            #text-overlay {
+                padding: 20px 12px 12px 12px;
+                font-size: 13px;
+            }
+            
+            #main-text {
+                font-size: 16px;
+            }
+            
+            #sub-text {
+                font-size: 13px;
+            }
+            
+            #start-button {
+                padding: 15px 30px;
+                font-size: 16px;
+            }
+        }
+
+        /* フェードイン効果 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div id="camera-container">
+        <video id="camera" autoplay muted playsinline></video>
+    </div>
+
+    <button id="start-button">体験を開始</button>
+    <div id="loading">カメラを起動中...</div>
+
+    <div id="image-card">
+        <button id="close-button">×</button>
+        <div id="image-container">
+            <img id="theater-image" 
+                src="https://via.placeholder.com/320x240/1a1a1a/ffffff?text=GEAR%0A%E3%83%8E%E3%83%B3%E3%83%90%E3%83%BC%E3%83%90%E3%83%AB%E3%82%B7%E3%82%A2%E3%82%BF%E3%83%BC" 
+                alt="ノンバーバルシアター ギア">
+            <div id="text-overlay">
+                <div id="main-text">答えは、ここに</div>
+                <div id="sub-text">ノンバーバルシアター「ギア」</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="error-message">
+        カメラへのアクセスが拒否されました。<br>
+        ブラウザの設定を確認してください。
+    </div>
+
+    <script>
+        const startButton = document.getElementById('start-button');
+        const imageCard = document.getElementById('image-card');
+        const closeButton = document.getElementById('close-button');
+        const camera = document.getElementById('camera');
+        const errorMessage = document.getElementById('error-message');
+        const loading = document.getElementById('loading');
+
+        let stream = null;
+
+        // カメラ開始
+        async function startCamera() {
+            try {
+                startButton.style.display = 'none';
+                loading.style.display = 'block';
+
+                // カメラへのアクセス要求（背面カメラを優先）
+                const constraints = {
+                    video: {
+                        facingMode: 'environment', // 背面カメラ
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                camera.srcObject = stream;
+                
+                // カメラが開始されたら画像カードを表示
+                loading.style.display = 'none';
+                imageCard.style.display = 'block';
+                imageCard.classList.add('fade-in');
+                
+            } catch (error) {
+                console.error('カメラアクセスエラー:', error);
+                loading.style.display = 'none';
+                showError();
+            }
+        }
+
+        // エラーメッセージ表示
+        function showError() {
+            errorMessage.style.display = 'block';
+            startButton.style.display = 'none';
+        }
+
+        // カメラ停止
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        // 画像カードを閉じる
+        function closeImageCard() {
+            imageCard.style.display = 'none';
+            startButton.style.display = 'block';
+            stopCamera();
+        }
+
+        // イベントリスナー
+        startButton.addEventListener('click', startCamera);
+        closeButton.addEventListener('click', closeImageCard);
+
+        // ページを離れる時にカメラを停止
+        window.addEventListener('beforeunload', stopCamera);
+
+        // 画面回転対応
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                if (stream) {
+                    camera.style.height = '100vh';
+                }
+            }, 500);
+        });
+
+        // 画像読み込みエラー対応
+        document.getElementById('theater-image').addEventListener('error', function() {
+            this.style.background = '#1a1a1a';
+            this.alt = 'ギアの画像を読み込み中...';
+        });
+    </script>
+</body>
+</html>
