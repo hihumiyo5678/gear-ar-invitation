@@ -69,6 +69,18 @@
             border-radius: 0;
         }
 
+        #ground-shadow {
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 15px;
+            background: radial-gradient(ellipse, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 50%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
         #text-overlay {
             position: absolute;
             bottom: -60px;
@@ -123,22 +135,7 @@
         }
 
         #close-button {
-            position: absolute;
-            top: 12px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
-
-        #close-button:hover {
-            background: rgba(0, 0, 0, 0.8);
+            display: none;
         }
 
         #error-message {
@@ -179,18 +176,9 @@
                 padding: 15px;
             }
             
-            #text-overlay {
-                padding: 12px;
-                font-size: 13px;
-                bottom: -50px;
-            }
-            
-            #main-text {
-                font-size: 16px;
-            }
-            
-            #sub-text {
-                font-size: 13px;
+            #ground-shadow {
+                width: 50%;
+                height: 12px;
             }
             
             #start-button {
@@ -224,6 +212,7 @@
             <img id="theater-image" 
                 src="doll.png" 
                 alt="ノンバーバルシアター ギア">
+            <div id="ground-shadow"></div>
         </div>
     </div>
 
@@ -287,16 +276,14 @@
             }
         }
 
-        // 画像カードを閉じる
+        // 画像カードを閉じる機能を削除（バツボタンなし）
         function closeImageCard() {
-            imageCard.style.display = 'none';
-            startButton.style.display = 'block';
-            stopCamera();
+            // 何もしない（画像は常に表示）
         }
 
         // イベントリスナー
         startButton.addEventListener('click', startCamera);
-        closeButton.addEventListener('click', closeImageCard);
+        // closeButtonのイベントリスナーを削除
 
         // ページを離れる時にカメラを停止
         window.addEventListener('beforeunload', stopCamera);
