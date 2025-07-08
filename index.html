@@ -135,7 +135,12 @@
         }
 
         #close-button {
-            display: none;
+            display: none !important;
+            visibility: hidden;
+        }
+
+        button[id*="close"] {
+            display: none !important;
         }
 
         #error-message {
