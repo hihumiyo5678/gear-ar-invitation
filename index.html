@@ -81,63 +81,6 @@
             z-index: -1;
         }
 
-        #shutter-button {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 15;
-            width: 80px;
-            height: 80px;
-            background: white;
-            border: 4px solid #ddd;
-            border-radius: 50%;
-            cursor: pointer;
-            display: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: all 0.2s ease;
-        }
-
-        #shutter-button:active {
-            transform: translateX(-50%) scale(0.95);
-            background: #f0f0f0;
-        }
-
-        #shutter-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            background: white;
-            border: 2px solid #ccc;
-            border-radius: 50%;
-        }
-
-        #capture-flash {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            z-index: 30;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .flash-animation {
-            animation: flashEffect 0.3s ease-out;
-        }
-
-        @keyframes flashEffect {
-            0% { opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0; }
-        }
-
         #text-overlay {
             position: absolute;
             bottom: -60px;
@@ -239,17 +182,6 @@
                 bottom: 0px;
             }
             
-            #shutter-button {
-                width: 70px;
-                height: 70px;
-                bottom: 25px;
-            }
-            
-            #shutter-button::before {
-                width: 50px;
-                height: 50px;
-            }
-            
             #start-button {
                 padding: 15px 30px;
                 font-size: 16px;
@@ -297,8 +229,6 @@
         const camera = document.getElementById('camera');
         const errorMessage = document.getElementById('error-message');
         const loading = document.getElementById('loading');
-        const shutterButton = document.getElementById('shutter-button');
-        const captureFlash = document.getElementById('capture-flash');
 
         let stream = null;
 
@@ -321,10 +251,9 @@
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
                 camera.srcObject = stream;
                 
-                // カメラが開始されたら画像カードとシャッターボタンを表示
+                // カメラが開始されたら画像カードを表示
                 loading.style.display = 'none';
                 imageCard.style.display = 'block';
-                shutterButton.style.display = 'block';
                 imageCard.classList.add('fade-in');
                 
             } catch (error) {
@@ -348,40 +277,8 @@
             }
         }
 
-        // 写真撮影機能
-        function capturePhoto() {
-            // フラッシュ効果
-            captureFlash.classList.add('flash-animation');
-            
-            // Canvas要素を作成してスクリーンショットを撮影
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // 画面サイズに合わせる
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            // カメラ映像を描画
-            ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
-            
-            // 画像とテキストを重ね描画（簡易版）
-            // 実際の重ね合わせは複雑なため、ここではフラッシュ効果のみ
-            
-            // ダウンロード用のリンクを作成
-            const link = document.createElement('a');
-            link.download = 'gear-ar-photo.png';
-            link.href = canvas.toDataURL();
-            
-            // 自動ダウンロード（ブラウザによっては制限あり）
-            setTimeout(() => {
-                link.click();
-                captureFlash.classList.remove('flash-animation');
-            }, 100);
-        }
-
         // イベントリスナー
         startButton.addEventListener('click', startCamera);
-        shutterButton.addEventListener('click', capturePhoto);
 
         // ページを離れる時にカメラを停止
         window.addEventListener('beforeunload', stopCamera);
